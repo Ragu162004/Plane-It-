@@ -30,6 +30,7 @@ function CreateTrip() {
   const [formData, setFormData] = useState({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false); // New state
   const navigate = useNavigate();
 
   const { user, loginWithPopup, isAuthenticated } = useContext(LogInContext);
@@ -42,7 +43,7 @@ function CreateTrip() {
     await loginWithPopup();
   };
 
-const SaveUser = async () => {
+  const SaveUser = async () => {
     const User = JSON.parse(localStorage.getItem("User"));
     const id = User?.email;
 
@@ -50,24 +51,34 @@ const SaveUser = async () => {
     console.log("User ID:", id);
 
     if (!id) {
-        console.error("No valid user ID found!");
-        return;
+      console.error("No valid user ID found!");
+      return;
     }
 
     try {
-        await setDoc(doc(db, "Users", id), {
-            userName: User?.name || "Unnamed User",
-            userEmail: User?.email || "No Email",
-            userPicture: User?.picture || "",
-            userNickname: User?.nickname || "",
-        });
-        console.log("User saved successfully");
+      await setDoc(doc(db, "Users", id), {
+        userName: User?.name || "Unnamed User",
+        userEmail: User?.email || "No Email",
+        userPicture: User?.picture || "",
+        userNickname: User?.nickname || "",
+      });
+      console.log("User saved successfully");
     } catch (error) {
-        console.error("Error saving user: ", error);
+      console.error("Error saving user: ", error);
     }
-};
+  };
 
+  useEffect(() => {
+    const loadScript = () => {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAP_API_KEY}&libraries=places`;
+      script.async = true;
+      script.onload = () => setIsScriptLoaded(true); // Set the script loaded state
+      document.body.appendChild(script);
+    };
 
+    loadScript();
+  }, []);
 
   useEffect(() => {
     if (user && isAuthenticated) {
@@ -98,8 +109,6 @@ const SaveUser = async () => {
       console.error("Error saving trip: ", error);
     }
   };
-
-
 
   const generateTrip = async () => {
     if (!isAuthenticated) {
@@ -153,16 +162,20 @@ const SaveUser = async () => {
           <h2 className="font-semibold text-md md:text-lg mb-3 text-center md:text-left">
             Where do you want to Explore? 🏖️
           </h2>
-          <GooglePlacesAutocomplete
-            apiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}
-            selectProps={{
-              value: place,
-              onChange: (place) => {
-                setPlace(place);
-                handleInputChange("location", place.label);
-              },
-            }}
-          />
+          {isScriptLoaded ? ( // Conditionally render the autocomplete
+            <GooglePlacesAutocomplete
+              apiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}
+              selectProps={{
+                value: place,
+                onChange: (place) => {
+                  setPlace(place);
+                  handleInputChange("location", place.label);
+                },
+              }}
+            />
+          ) : (
+            <p>Loading Google Places...</p>
+          )}
         </div>
 
         <div className="day">
