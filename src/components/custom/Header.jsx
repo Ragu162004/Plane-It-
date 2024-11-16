@@ -30,7 +30,7 @@ function Header() {
     <div className="w-full flex items-center justify-between shadow-sm p-3 md:px-5">
         <div className="logo flex gap-2 items-center justify-between">
           <div className="img inline-block h-5 w-5 md:h-10 md:w-10">
-            <Link to="/">
+            <Link to="http://localhost:5173/">
             <h1>Home</h1>
             </Link>
           </div>
