@@ -31,11 +31,11 @@ function Header() {
         <div className="logo flex gap-2 items-center justify-between">
           <div className="img inline-block h-5 w-5 md:h-10 md:w-10">
             <Link to="/">
-            <img src="/logoipsum-247.svg" alt="" />
+            <h1>Home</h1>
             </Link>
           </div>
           <h1 className="text-lg md:text-3xl font-bold">
-          Plan It
+        
           </h1>
         </div>
       {isAuthenticated ? 
